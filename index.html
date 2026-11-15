@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cal AI India</title>
+<style>
+:root{--bg:#faf7f2;--card:#fff;--tx:#1d1b18;--mu:#7a746b;--ac:#e8590c;--ln:#ece6dc;--p:#2f9e44;--c:#f08c00;--f:#7048e8;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root:not([data-theme="light"]){color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#17150f;--card:#221f18;--tx:#f3eee6;--mu:#a39b8d;--ln:#35302500;--ln:#352f25;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#17150f;--card:#221f18;--tx:#f3eee6;--mu:#a39b8d;--ln:#352f25;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:480px;margin:0 auto;padding:16px 16px 40px}
+h1{font-size:22px;margin:4px 0 14px;display:flex;justify-content:space-between;align-items:center}
+h1 small{font-size:12px;color:var(--mu);font-weight:500}
+.card{background:var(--card);border:1px solid var(--ln);border-radius:20px;padding:16px;margin-bottom:12px}
+.ring{display:flex;align-items:center;gap:16px}
+.ring svg{flex:none}
+.big{font-size:30px;font-weight:700;line-height:1}
+.mu{color:var(--mu);font-size:13px}
+.macros{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.m b{display:block;font-size:15px}
+.bar{height:6px;background:var(--ln);border-radius:4px;overflow:hidden;margin-top:4px}
+.bar i{display:block;height:100%;border-radius:4px}
+button,.btn{font:inherit;border:0;border-radius:14px;padding:13px 16px;background:var(--ac);color:#fff;font-weight:600;width:100%;cursor:pointer;text-align:center;display:block}
+button.sec{background:var(--ln);color:var(--tx)}
+button:disabled{opacity:.6}
+input[type=file]{display:none}
+.row{display:flex;gap:8px}
+.row>*{flex:1}
+.item{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-top:1px solid var(--ln);gap:10px}
+.item:first-child{border-top:0}
+.item b{font-weight:600}
+.x{background:none;color:var(--mu);width:auto;padding:4px 8px;font-size:18px}
+img.prev{width:100%;max-height:220px;object-fit:cover;border-radius:14px;margin-bottom:10px}
+input[type=number],input[type=text]{font:inherit;padding:10px;border-radius:10px;border:1px solid var(--ln);background:var(--bg);color:var(--tx);width:100%}
+.err{color:#e03131;font-size:14px;margin-top:8px}
+.hide{display:none}
+</style>
+</head>
+<body>
+<main>
+<h1>Cal AI India <small id="date"></small></h1>
+
+<div class="card">
+  <div class="ring">
+    <svg width="120" height="120" viewBox="0 0 120 120" aria-hidden="true">
+      <circle cx="60" cy="60" r="50" fill="none" stroke="var(--ln)" stroke-width="12"/>
+      <circle id="arc" cx="60" cy="60" r="50" fill="none" stroke="var(--ac)" stroke-width="12" stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="314" transform="rotate(-90 60 60)"/>
+    </svg>
+    <div>
+      <div class="big" id="left">0</div>
+      <div class="mu">kcal bache hain</div>
+      <div class="mu" id="eaten" style="margin-top:6px"></div>
+    </div>
+  </div>
+  <div class="macros">
+    <div class="m"><span class="mu">Protein</span><b id="tp">0g</b><div class="bar"><i id="bp" style="background:var(--p);width:0"></i></div></div>
+    <div class="m"><span class="mu">Carbs</span><b id="tc">0g</b><div class="bar"><i id="bc" style="background:var(--c);width:0"></i></div></div>
+    <div class="m"><span class="mu">Fat</span><b id="tf">0g</b><div class="bar"><i id="bf" style="background:var(--f);width:0"></i></div></div>
+  </div>
+</div>
+
+<div class="card">
+  <div class="row">
+    <label class="btn" for="cam">📷 Photo se scan</label>
+    <label class="btn" style="background:var(--ln);color:var(--tx)" for="gal">🖼️ Gallery</label>
+  </div>
+  <input id="cam" type="file" accept="image/*" capture="environment">
+  <input id="gal" type="file" accept="image/*">
+  <div id="scan" class="hide" style="margin-top:12px">
+    <img id="prev" class="prev" alt="">
+    <div id="status" class="mu"></div>
+    <div id="res"></div>
+    <div id="err" class="err"></div>
+  </div>
+</div>
+
+<div class="card">
+  <b>Aaj ka khaana</b>
+  <div id="log" style="margin-top:6px"></div>
+  <div id="empty" class="mu" style="padding:10px 0">Abhi kuch log nahi hua. Thali ki photo kheench ke dekho!</div>
+</div>
+
+<div class="card">
+  <b>Manual add</b>
+  <div class="row" style="margin-top:8px"><input id="mn" type="text" placeholder="Khaana (e.g. 2 roti)"><input id="mc" type="number" inputmode="numeric" placeholder="kcal"></div>
+  <button class="sec" id="madd" style="margin-top:8px">Add karo</button>
+</div>
+
+<div class="card">
+  <label class="mu" for="goal">Daily calorie goal (kcal)</label>
+  <input id="goal" type="number" inputmode="numeric" value="2000" style="margin-top:6px">
+</div>
+<p class="mu" style="text-align:center">AI ka estimate approximate hota hai, medical advice nahi hai.</p>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const KEY='calai-india-v1';
+const today=()=>new Date().toISOString().slice(0,10);
+let st={goal:2000,days:{}};
+try{const r=localStorage.getItem(KEY);if(r)st=Object.assign(st,JSON.parse(r))}catch(e){}
+const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(st))}catch(e){}};
+const day=()=>st.days[today()]||(st.days[today()]=[]);
+$('date').textContent=new Date().toLocaleDateString('en-IN',{weekday:'short',day:'numeric',month:'short'});
+$('goal').value=st.goal;
+$('goal').onchange=()=>{st.goal=Math.max(500,+$('goal').value||2000);save();render()};
+
+function render(){
+  const L=day(),s=k=>Math.round(L.reduce((a,x)=>a+(+x[k]||0),0));
+  const cal=s('cal'),p=s('p'),c=s('c'),f=s('f'),g=st.goal;
+  $('left').textContent=Math.max(0,g-cal);
+  $('eaten').textContent=cal+' / '+g+' kcal khaaya';
+  $('arc').style.strokeDashoffset=314*(1-Math.min(1,cal/g));
+  $('tp').textContent=p+'g';$('tc').textContent=c+'g';$('tf').textContent=f+'g';
+  $('bp').style.width=Math.min(100,p/(g*0.25/4)*100)+'%';
+  $('bc').style.width=Math.min(100,c/(g*0.5/4)*100)+'%';
+  $('bf').style.width=Math.min(100,f/(g*0.25/9)*100)+'%';
+  $('empty').classList.toggle('hide',L.length>0);
+  const box=$('log');box.textContent='';
+  L.forEach((x,i)=>{
+    const d=document.createElement('div');d.className='item';
+    const a=document.createElement('div');
+    const b=document.createElement('b');b.textContent=x.name;
+    const m=document.createElement('div');m.className='mu';
+    m.textContent=(x.p!=null?'P '+x.p+'g · C '+x.c+'g · F '+x.f+'g':'Manual');
+    a.append(b,m);
+    const r=document.createElement('div');r.style.whiteSpace='nowrap';
+    r.textContent=Math.round(x.cal)+' kcal';
+    const del=document.createElement('button');del.className='x';del.textContent='×';del.setAttribute('aria-label','Delete');
+    del.onclick=()=>{L.splice(i,1);save();render()};
+    r.append(del);d.append(a,r);box.append(d);
+  });
+}
+
+$('madd').onclick=()=>{
+  const n=$('mn').value.trim(),c=+$('mc').value;
+  if(!n||!c)return;
+  day().push({name:n,cal:c});save();render();$('mn').value='';$('mc').value='';
+};
+
+function shrink(file){
+  return new Promise((ok,no)=>{
+    const img=new Image(),u=URL.createObjectURL(file);
+    img.onload=()=>{
+      const k=Math.min(1,1024/Math.max(img.width,img.height));
+      const cv=document.createElement('canvas');
+      cv.width=Math.round(img.width*k);cv.height=Math.round(img.height*k);
+      cv.getContext('2d').drawImage(img,0,0,cv.width,cv.height);
+      cv.toBlob(b=>b?ok({blob:b,url:cv.toDataURL('image/jpeg',.7)}):no(new Error('img')),'image/jpeg',.82);
+      URL.revokeObjectURL(u);
+    };
+    img.onerror=()=>no(new Error('img'));img.src=u;
+  });
+}
+
+async function scan(file){
+  if(!file)return;
+  $('scan').classList.remove('hide');$('res').textContent='';$('err').textContent='';
+  $('status').textContent='Photo process ho rahi hai…';
+  try{
+    const {url}=await shrink(file);
+    $('prev').src=url;
+    $('status').textContent='Khaana pehchaan raha hai…';
+    const r=await fetch('/api/scan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({image:url.split(',')[1]})});
+    if(!r.ok)throw new Error('api');
+    const out=await r.json();
+    $('status').textContent=out.note||'';
+    show(out.items||[]);
+  }catch(e){
+    $('status').textContent='';
+    $('err').textContent='Scan fail ho gaya. Dobara try karo ya manual add karo.';
+  }
+}
+
+function show(items){
+  const r=$('res');r.textContent='';
+  if(!items.length){return}
+  const tot=items.reduce((a,x)=>a+(+x.cal||0),0);
+  items.forEach(x=>{
+    const d=document.createElement('div');d.className='item';
+    const a=document.createElement('div');
+    const b=document.createElement('b');b.textContent=x.name;
+    const m=document.createElement('div');m.className='mu';
+    m.textContent='P '+Math.round(x.p)+'g · C '+Math.round(x.c)+'g · F '+Math.round(x.f)+'g';
+    a.append(b,m);
+    const k=document.createElement('div');k.textContent=Math.round(x.cal)+' kcal';
+    d.append(a,k);r.append(d);
+  });
+  const btn=document.createElement('button');
+  btn.textContent='Log karo ('+Math.round(tot)+' kcal)';btn.style.marginTop='10px';
+  btn.onclick=()=>{
+    items.forEach(x=>day().push({name:x.name,cal:Math.round(x.cal),p:Math.round(x.p),c:Math.round(x.c),f:Math.round(x.f)}));
+    save();render();r.textContent='';$('scan').classList.add('hide');
+  };
+  r.append(btn);
+}
+
+$('cam').onchange=e=>{scan(e.target.files[0]);e.target.value=''};
+$('gal').onchange=e=>{scan(e.target.files[0]);e.target.value=''};
+render();
+</script>
+</body>
+</html>
